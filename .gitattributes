@@ -1,0 +1,13 @@
+# Force LF line endings for files that run inside Linux containers,
+# regardless of git's core.autocrlf setting on Windows. Without this,
+# checking out on Windows can turn "#!/bin/sh" into "#!/bin/sh\r", which
+# Linux can't parse - the container then fails with a confusing
+# "start.sh: not found" error even though the file is clearly there.
+*.sh text eol=lf
+docker/**/*.conf text eol=lf
+Dockerfile text eol=lf
+docker-compose.yml text eol=lf
+
+# Windows-native scripts should keep CRLF.
+*.bat text eol=crlf
+*.ps1 text eol=crlf

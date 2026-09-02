@@ -1,0 +1,53 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Dependencies
+vendor/
+node_modules/
+composer.lock
+# package-lock.json is intentionally NOT ignored: the Dockerfile's assets
+# build stage does `COPY package.json package-lock.json ./` then `npm ci`,
+# which needs the lockfile to exist in the git repo (Render builds straight
+# from git, not your local disk) - if this is ignored, Render's build fails
+# with "package-lock.json: not found".
+
+# Application (LavaLust's own cache/log/session folder)
+runtime/*
+!runtime/.htaccess
+!runtime/index.html
+
+# Docker
+.docker/
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Testing
+.coverage/
+phpunit.xml
+
+# Backup files
+*.bak
+*.tmp
+
+# Frontend build output (Tailwind via Vite)
+/public/build/
+/public/hot
+
+# Files the device bridge couldn't delete directly get moved here instead -
+# never meant to be committed (this got committed by accident once already,
+# which is why every clone had a stale _to_delete/ full of old git lock files)
+_to_delete/

@@ -1,0 +1,12 @@
+git clone https://github.com/Aysayas/Lavalust-Template.git my-new-project
+cd my-new-project
+
+Then double-click setup-new-project.bat (it copies .env.example to .env,
+renames the project everywhere, optionally resets git history, and starts
+Docker for you - see setup-new-project.bat's comments for details).
+
+IMPORTANT: the "my-new-project" at the end of the git clone line is what
+names your folder. If you leave it off, git names the folder after the repo
+itself (e.g. "Lavalust-Template") instead of your project - the setup script
+renames things INSIDE the project but does not rename its own folder while
+running, so pick the folder name at clone time.

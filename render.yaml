@@ -1,0 +1,37 @@
+# Render Blueprint - deploy with "New > Blueprint" in the Render dashboard.
+# Render has no managed MySQL, so DB_* vars point at an external MySQL host
+# (e.g. PlanetScale, Aiven, AWS RDS) that you fill in via the dashboard after
+# the first deploy - app/config/database.php already reads these via getenv().
+# If you'd rather use Render's managed Postgres, add a `databases:` block and
+# switch app/config/database.php's driver/DSN to pdo/pgsql instead.
+services:
+  - type: web
+    name: lavalust-app
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: starter          # free plan has no persistent disk - see DOCKER_SETUP.md
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        fromService:
+          type: web
+          name: lavalust-app
+          property: host
+      - key: SESSION_DRIVER
+        value: database
+      - key: APP_KEY
+        generateValue: true
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "3306"
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
