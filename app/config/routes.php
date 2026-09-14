@@ -44,5 +44,29 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 */
 /** @var object $router **/
 
+// Loaded here (not via app/config/autoload.php's 'configs' autoload list) because
+// this file is require_once'd by scheme/kernel/LavaLust.php before $router->initiate()
+// runs, while the 'configs' autoload only fires later, inside a Controller's
+// constructor — too late for middleware, which resolves before any Controller exists.
+require_once APP_DIR . 'config/middleware.php';
+
 $router->get('/', 'Welcome::index');
-$router->get('/user', 'UserController::user');
+
+// Auth routes (public)
+$router->get('/login', 'AuthController::login');           // show login form
+$router->post('/login', 'AuthController::authenticate');   // handle login submit
+$router->get('/logout', 'AuthController::logout');         // destroy session, redirect to login
+
+// Products CRUD routes — gated by the 'auth' middleware (see app/config/middleware.php).
+// The handout names /products, /products/create, /products/edit/{id}, /products/delete/{id}
+// as protected; the matching POST endpoints (store/update) are protected alongside their
+// GET form counterparts since leaving them open would defeat the point of gating the forms.
+$router->group(['middleware' => 'auth'], function ($router) {
+    $router->get('/products', 'ProductController::index');                  // list all products
+    $router->get('/products/create', 'ProductController::create');         // show create form
+    $router->post('/products/store', 'ProductController::store');         // handle create submit
+    $router->get('/products/edit/{id}', 'ProductController::edit');       // show edit form
+    $router->post('/products/update/{id}', 'ProductController::update'); // handle edit submit
+    $router->get('/products/delete/{id}', 'ProductController::delete'); // delete a product
+});
+
