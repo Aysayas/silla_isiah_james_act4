@@ -464,3 +464,45 @@ if ( ! function_exists('is_https'))
 		return FALSE;
 	}
 }
+
+// Backported from upstream LavaLust (scheme/kernel/Routine.php): the updated
+// scheme/libraries/Api.php calls handle_cors() as a global function.
+if ( ! function_exists('handle_cors'))
+{
+	/**
+	 * Handle CORS
+	 *
+	 * Sends CORS headers based on the allow_origin setting in app/config/api.php.
+	 *
+	 * @return void
+	 */
+	function handle_cors()
+	{
+		$allow_origin = config_item('allow_origin');
+		$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+		if (is_array($allow_origin)) {
+			$allowed = in_array($origin, $allow_origin, true);
+		} else {
+			$allowed = $allow_origin === '*' || $allow_origin === $origin;
+		}
+
+		if ($allowed && $origin) {
+			header("Access-Control-Allow-Origin: {$origin}");
+			header('Access-Control-Allow-Credentials: true');
+			header('Vary: Origin');
+		}
+
+		header(
+			'Access-Control-Allow-Headers: ' .
+			'Authorization, Content-Type, X-Requested-With, X-RateLimit-*'
+		);
+
+		header(
+			'Access-Control-Allow-Methods: ' .
+			'GET, POST, PUT, DELETE, PATCH, OPTIONS'
+		);
+
+		header('Access-Control-Max-Age: 3600');
+	}
+}

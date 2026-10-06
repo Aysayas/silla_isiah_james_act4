@@ -52,21 +52,70 @@ require_once APP_DIR . 'config/middleware.php';
 
 $router->get('/', 'Welcome::index');
 
-// Auth routes (public)
-$router->get('/login', 'AuthController::login');           // show login form
-$router->post('/login', 'AuthController::authenticate');   // handle login submit
-$router->get('/logout', 'AuthController::logout');         // destroy session, redirect to login
+// Migration Routes (blocked over HTTP when APP_ENV=production, see MigrationController)
+$router->get('create-migration/{migration_class}', 'MigrationController::create_migration');
+$router->get('migrate', 'MigrationController::migrate');
+$router->get('rollback', 'MigrationController::rollback');
+$router->get('rollback-all', 'MigrationController::rollback_all');
+$router->get('refresh', 'MigrationController::refresh');
+$router->get('status', 'MigrationController::status');
 
-// Products CRUD routes — gated by the 'auth' middleware (see app/config/middleware.php).
-// The handout names /products, /products/create, /products/edit/{id}, /products/delete/{id}
-// as protected; the matching POST endpoints (store/update) are protected alongside their
-// GET form counterparts since leaving them open would defeat the point of gating the forms.
-$router->group(['middleware' => 'auth'], function ($router) {
-    $router->get('/products', 'ProductController::index');                  // list all products
-    $router->get('/products/create', 'ProductController::create');         // show create form
-    $router->post('/products/store', 'ProductController::store');         // handle create submit
-    $router->get('/products/edit/{id}', 'ProductController::edit');       // show edit form
-    $router->post('/products/update/{id}', 'ProductController::update'); // handle edit submit
-    $router->get('/products/delete/{id}', 'ProductController::delete'); // delete a product
-});
+// REST API for the React frontend (Lab Exercise 6). Auth is JWT via the Api
+// library: every products route checks the Bearer token inside the controller.
+$router->post('/api/auth/login', 'ApiAuthController::login');
+$router->post('/api/auth/refresh', 'ApiAuthController::refresh');
+$router->post('/api/auth/logout', 'ApiAuthController::logout');
+$router->get('/api/auth/me', 'ApiAuthController::me');
+
+$router->get('/api/products', 'ApiProductController::index');
+$router->post('/api/products', 'ApiProductController::store');
+$router->get('/api/products/{id}', 'ApiProductController::show')->where_number('id');
+$router->put('/api/products/{id}', 'ApiProductController::update')->where_number('id');
+$router->patch('/api/products/{id}', 'ApiProductController::update')->where_number('id');
+$router->delete('/api/products/{id}', 'ApiProductController::destroy')->where_number('id');
+
+// CORS preflight requests sent by the browser before PUT/PATCH/DELETE or Authorization headers
+$router->options('/api/auth/{action}', 'ApiAuthController::options');
+$router->options('/api/products', 'ApiProductController::options');
+$router->options('/api/products/{id}', 'ApiProductController::options');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // Auth routes (public)
+// $router->get('/login', 'AuthController::login');           // show login form
+// $router->post('/login', 'AuthController::authenticate');   // handle login submit
+// $router->get('/logout', 'AuthController::logout');         // destroy session, redirect to login
+
+// // Products CRUD routes — gated by the 'auth' middleware (see app/config/middleware.php).
+// // The handout names /products, /products/create, /products/edit/{id}, /products/delete/{id}
+// // as protected; the matching POST endpoints (store/update) are protected alongside their
+// // GET form counterparts since leaving them open would defeat the point of gating the forms.
+// $router->group(['middleware' => 'auth'], function ($router) {
+//     $router->get('/products', 'ProductController::index');                  // list all products
+//     $router->get('/products/create', 'ProductController::create');         // show create form
+//     $router->post('/products/store', 'ProductController::store');         // handle create submit
+//     $router->get('/products/edit/{id}', 'ProductController::edit');       // show edit form
+//     $router->post('/products/update/{id}', 'ProductController::update'); // handle edit submit
+//     $router->get('/products/delete/{id}', 'ProductController::delete'); // delete a product
+// });
 
